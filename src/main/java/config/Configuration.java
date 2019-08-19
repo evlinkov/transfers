@@ -32,9 +32,7 @@ public class Configuration {
         FileInputStream fileInputStream = new FileInputStream("src/main/resources/config.properties");
         property.load(fileInputStream);
 
-        configuration.port = Integer.valueOf(property.getProperty("server.port"));
-
+        configuration.port = Integer.parseInt(property.getProperty("server.port"));
         return configuration;
     }
-
 }
