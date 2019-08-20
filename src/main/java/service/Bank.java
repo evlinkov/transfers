@@ -17,11 +17,27 @@ public class Bank {
     private List<Lock> lock;
 
     public Double getAmount(Integer userIdentifier) {
-        return this.userAccounts.getOrDefault(userIdentifier, .0);
+        this.userAccounts.putIfAbsent(userIdentifier, .0);
+        return this.userAccounts.get(userIdentifier);
     }
 
     public void transfer(Integer userIdentifierFrom, Integer userIdentifierTo, Double amount) throws NotEnoughMoneyException {
+        add(userIdentifierFrom, -amount);
+        add(userIdentifierTo, amount);
+    }
 
+    private void add(Integer userIdentifier, Double add) throws NotEnoughMoneyException {
+        int userIdentifierLockIndex = getLockIndexByUserIdentifier(userIdentifier);
+        this.lock.get(userIdentifierLockIndex).lock();
+        try {
+            Double userIdentifierFromBalance = this.getAmount(userIdentifier);
+            if (add > 0 && userIdentifierFromBalance < add) {
+                throw new NotEnoughMoneyException();
+            }
+            this.userAccounts.put(userIdentifier, userIdentifierFromBalance + add);
+        } finally {
+            this.lock.get(userIdentifierLockIndex).unlock();
+        }
     }
 
     public synchronized static Bank getBank() {
