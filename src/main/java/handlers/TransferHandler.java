@@ -34,16 +34,24 @@ public class TransferHandler implements HttpHandler {
                 String request = IOUtils.toString(exchange.getRequestBody(), String.valueOf(StandardCharsets.UTF_8));
                 try {
                     TransferRequest transferRequest = (new Gson()).fromJson(request, TransferRequest.class);
+                    if (transferRequest == null) {
+                        throw new JsonSyntaxException("incorrect json");
+                    }
                     if (transferRequest.getUserIdentifier() == 0) {
                         httpCode = 400;
                         response = "not correct user to response amount";
                     } else {
-                        if (transferRequest.getAmount() <= 0) {
+                        if (userIdentifierFrom.equals(transferRequest.getUserIdentifier())) {
                             httpCode = 400;
-                            response = "choose correct sum to send";
+                            response = "you cannot send money to yourself";
                         } else {
-                            Bank.getBank().transfer(userIdentifierFrom, transferRequest.getUserIdentifier(), transferRequest.getAmount());
-                            response = "transfer was success";
+                            if (transferRequest.getAmount() <= 0) {
+                                httpCode = 400;
+                                response = "choose correct sum to send";
+                            } else {
+                                Bank.getBank().transfer(userIdentifierFrom, transferRequest.getUserIdentifier(), transferRequest.getAmount());
+                                response = "transfer was success";
+                            }
                         }
                     }
                 } catch (JsonSyntaxException error) {
