@@ -22,8 +22,8 @@ public class Bank {
     }
 
     public void transfer(Integer userIdentifierFrom, Integer userIdentifierTo, Double amount) throws NotEnoughMoneyException {
-        add(userIdentifierFrom, -amount);
-        add(userIdentifierTo, amount);
+        add(userIdentifierFrom, amount);
+        add(userIdentifierTo, -amount);
     }
 
     private void add(Integer userIdentifier, Double add) throws NotEnoughMoneyException {
@@ -34,7 +34,7 @@ public class Bank {
             if (add > 0 && userIdentifierFromBalance < add) {
                 throw new NotEnoughMoneyException();
             }
-            this.userAccounts.put(userIdentifier, userIdentifierFromBalance + add);
+            this.userAccounts.put(userIdentifier, userIdentifierFromBalance - add);
         } finally {
             this.lock.get(userIdentifierLockIndex).unlock();
         }
@@ -48,7 +48,11 @@ public class Bank {
     }
 
     private int getLockIndexByUserIdentifier(Integer userIdentifier) {
-        return (userIdentifier.toString() + "LOCK_INDEX").hashCode() % NUMBER_OF_LOCKS;
+        int lockIndex = (userIdentifier.toString() + "LOCK_INDEX").hashCode() % NUMBER_OF_LOCKS;
+        if (lockIndex < 0) {
+            lockIndex += NUMBER_OF_LOCKS;
+        }
+        return lockIndex;
     }
 
     private Bank() {
