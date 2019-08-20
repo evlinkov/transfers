@@ -1,6 +1,6 @@
 import com.sun.net.httpserver.HttpServer;
 import config.Configuration;
-import handlers.GetBalance;
+import handlers.GetBalanceHandler;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -12,7 +12,7 @@ public class ApplicationServer {
             Configuration configuration = Configuration.getConfiguration();
             HttpServer httpServer = HttpServer.create();
             httpServer.bind(new InetSocketAddress(configuration.getPort()), 0);
-            httpServer.createContext("/get", new GetBalance());
+            httpServer.createContext("/get", new GetBalanceHandler());
             httpServer.setExecutor(null);
             httpServer.start();
         } catch (IOException error) {

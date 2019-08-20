@@ -9,7 +9,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 
-public class GetBalance implements HttpHandler {
+public class GetBalanceHandler implements HttpHandler {
 
     @Override
     public void handle(HttpExchange exchange) throws IOException {
